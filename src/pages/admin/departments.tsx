@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/table";
 import { Pagination } from "@/components/pagination"; // Assuming you have a pagination component
 import { useDispatch, useSelector } from "react-redux";
-import { searchDepartments } from "@/slice/departmentSlice";
+import { createDepartment, searchDepartments } from "@/slice/departmentSlice";
 import { SearchRequest } from "@/util/searchRequest";
 
 interface Department {
@@ -82,15 +82,13 @@ export default function DepartmentManagement() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Add new department
-    // const newDepartment: Department = {
-    //   name: formData.name,
-    //   description: formData.description,
-    // };
-
-    // setDepartments([...departments, newDepartment]);
-    // setFormData({ name: "", description: "" });
-    // setOpen(false);
+    const newDepartment: Department = {
+      name: formData.name,
+      description: formData.description,
+    };
+    dispatch(createDepartment(newDepartment));
+    setFormData({ name: "", description: "" });
+    setOpen(false);
   };
 
   return (

@@ -43,7 +43,7 @@ import { MoreHorizontal, Plus, Search } from "lucide-react";
 import { Pagination } from "@/components/pagination";
 import { SearchRequest } from "@/util/searchRequest";
 import { useDispatch, useSelector } from "react-redux";
-import { searchPositions } from "@/slice/positionSlice";
+import { createPosition, searchPositions } from "@/slice/positionSlice";
 
 export default function Positions() {
   const [open, setOpen] = useState(false);
@@ -75,10 +75,13 @@ export default function Positions() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Here you would typically add the new position to your data
+
+    const newPosition = {
+      name: formData.name,
+      description: formData.description,
+    };
+    dispatch(createPosition(newPosition));
     setOpen(false);
-    // Reset form
     setFormData({
       name: "",
       description: "",
@@ -174,40 +177,41 @@ export default function Positions() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {positions && positions.map((position: any) => (
-                    <TableRow key={position.id}>
-                      <TableCell className="font-medium text-black">
-                        {position.name}
-                      </TableCell>
-                      <TableCell className="text-black">
-                        <span className="truncate max-w-[300px] block">
-                          {position.description}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-black hover:bg-[#334155]"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Mở menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Xóa phòng ban
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {positions &&
+                    positions.map((position: any) => (
+                      <TableRow key={position.id}>
+                        <TableCell className="font-medium text-black">
+                          {position.name}
+                        </TableCell>
+                        <TableCell className="text-black">
+                          <span className="truncate max-w-[300px] block">
+                            {position.description}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-black hover:bg-[#334155]"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Mở menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">
+                                Xóa chức vụ
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </div>

@@ -2,12 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
 // 1. Tạo position
-export const createPosition = createAsyncThunk(
+export const createPosition:any = createAsyncThunk(
   "position/create",
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/positions/create", data);
-      return res.data;
+      return res.data?.result;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }

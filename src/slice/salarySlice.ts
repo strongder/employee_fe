@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
 // 1. Tạo thưởng
-export const createSalary:any = createAsyncThunk(
+export const createSalary: any = createAsyncThunk(
   "salary/create",
   async (data, { rejectWithValue }) => {
     try {
@@ -41,7 +41,7 @@ export const getSalaryById = createAsyncThunk(
 );
 
 // 4. Cập nhật luơng
-export const updateSalary:any = createAsyncThunk(
+export const updateSalary: any = createAsyncThunk(
   "salary/update",
   async (
     { id, updatedData }: { id: any; updatedData: any },
@@ -62,7 +62,7 @@ export const getByEmployee: any = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const res = await api.get(`/salaries/${id}/employee`);
-      console.log("-------", res.data.result)
+      console.log("-------", res.data.result);
 
       return res?.data?.result;
     } catch (err: any) {
@@ -70,7 +70,6 @@ export const getByEmployee: any = createAsyncThunk(
     }
   }
 );
-
 
 // 5. Xóa thưởng
 export const deleteSalary = createAsyncThunk(
@@ -91,6 +90,21 @@ export const getAllSalary: any = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get(`/salaries/all`);
+      return res.data?.result;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const calculateSalary:any = createAsyncThunk(
+  "salary/calculateSalary",
+  async ({ param }: any, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/salaries/calculate`, {
+        params: param,
+      });
+
       return res.data?.result;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);

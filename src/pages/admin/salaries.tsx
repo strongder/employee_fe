@@ -51,6 +51,7 @@ import {
   updateSalary,
   deleteSalary,
   getAllSalary,
+  calculateSalary,
 } from "@/slice/salarySlice";
 import { URL_IMAGE } from "../../../api";
 
@@ -73,6 +74,7 @@ export default function Salaries() {
   // Thêm state cho form lương
   const [formData, setFormData] = useState<any>({
     employeeCode: "",
+    monthYear: "",
     baseSalary: "",
     allowanceAmount: "",
     bonusAmount: "",
@@ -133,6 +135,7 @@ export default function Salaries() {
     setEditingSalary(null);
     setFormData({
       employeeCode: "",
+      monthYear: "",
       baseSalary: "",
       allowanceAmount: "",
       bonusAmount: "",
@@ -144,11 +147,30 @@ export default function Salaries() {
     setShowAddModal(true);
   };
 
+  useEffect(() => {
+    const total =
+      Number(formData.baseSalary || 0) +
+      Number(formData.allowanceAmount || 0) +
+      Number(formData.bonusAmount || 0) -
+      Number(formData.deductionAmount || 0);
+
+    setFormData((prev: any) => ({
+      ...prev,
+      totalSalary: total,
+    }));
+  }, [
+    formData.baseSalary,
+    formData.allowanceAmount,
+    formData.bonusAmount,
+    formData.deductionAmount,
+  ]);
+
   // Mở modal sửa
   const openEditModal = (salary: any) => {
     setEditingSalary(salary);
     setFormData({
       employeeCode: salary.employee?.code || "",
+      monthYear: salary.monthYear,
       baseSalary: salary.baseSalary,
       allowanceAmount: salary.allowanceAmount,
       bonusAmount: salary.bonusAmount,
@@ -185,6 +207,7 @@ export default function Salaries() {
   const handleSubmitPayment = (salary: any) => {
     const updatedData = {
       employeeCode: salary.employee?.code || "",
+      monthYear: salary.monthYear,
       baseSalary: salary.baseSalary,
       allowanceAmount: salary.allowanceAmount,
       bonusAmount: salary.bonusAmount,
@@ -199,6 +222,31 @@ export default function Salaries() {
         updatedData,
       })
     );
+  };
+  const handleMonthYearBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const monthYear = e.target.value;
+    const employeeCode = formData.employeeCode.trim();
+
+    if (employeeCode && monthYear) {
+      const param = {
+        employeeCode,
+        monthYear, // YYYY-MM
+      };
+
+      console.log("param", param);
+
+      dispatch(calculateSalary({ param }))
+        .unwrap()
+        .then((res: any) => {
+          if (res) {
+            setFormData((prev: any) => ({
+              ...prev,
+              baseSalary: res.salary,
+              bonusAmount: res.totalBonus,
+            }));
+          }
+        });
+    }
   };
 
   return (
@@ -410,6 +458,15 @@ export default function Salaries() {
               onChange={handleChange}
               required
             />
+            <Label>Tháng</Label>
+            <Input
+              name="monthYear"
+              type="month"
+              value={formData.monthYear}
+              onChange={handleChange}
+              required
+              onBlur={handleMonthYearBlur}
+            />
             <Label>Lương cơ bản</Label>
             <Input
               name="baseSalary"
@@ -491,6 +548,15 @@ export default function Salaries() {
             <Input
               name="employeeCode"
               value={formData.employeeCode}
+              onChange={handleChange}
+              required
+            />
+            {/* them luong thang bao nhieu */}
+            <Label>Tháng</Label>
+            <Input
+              name="monthYear"
+              type="month"
+              value={formData.monthYear}
               onChange={handleChange}
               required
             />
