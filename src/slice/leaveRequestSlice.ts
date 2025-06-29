@@ -58,7 +58,7 @@ export const updateLeaveRequest: any = createAsyncThunk(
 );
 
 // 5. Xóa đơn xin nghỉ
-export const deleteLeaveRequest = createAsyncThunk(
+export const deleteLeaveRequest: any = createAsyncThunk(
   "leaveRequest/delete",
   async (id, { rejectWithValue }) => {
     try {
@@ -162,7 +162,7 @@ const leaveRequestSlice = createSlice({
       // Xóa
       .addCase(deleteLeaveRequest.fulfilled, (state, action) => {
         state.loading = false;
-        state.leaveRequests = state.leaveRequests.filter(
+        state.leaveRequestAll = state.leaveRequestAll.filter(
           (item: any) => item.id !== action.payload
         );
       })

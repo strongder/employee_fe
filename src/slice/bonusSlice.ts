@@ -86,7 +86,9 @@ export const getByEmployee: any = createAsyncThunk(
   "bonus/getByEmployee",
   async (id, { rejectWithValue }) => {
     try {
+      console.log(id);
       const res = await api.get(`/bonuses/${id}/employee`);
+      console.log(res.data.result);
       return res?.data?.result;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);

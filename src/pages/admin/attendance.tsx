@@ -45,15 +45,16 @@ import {
 import { vi } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAttendance } from "@/slice/attendanceSlice";
+import { deleteAttendance, getAllAttendance } from "@/slice/attendanceSlice";
 import { URL_IMAGE } from "../../../api";
+import { getAllDepartments } from "@/slice/departmentSlice";
 
 export default function Attendance() {
   const dispatch = useDispatch();
   const { attendanceAll, loading } = useSelector(
     (state: any) => state.attendance
   );
-
+  const { departmentAll } = useSelector((state: any) => state.department);
   const [searchRequest, setSearchRequest] = useState({
     keyword: "",
     department: "ALL",
@@ -67,24 +68,30 @@ export default function Attendance() {
 
   useEffect(() => {
     dispatch(getAllAttendance());
+    dispatch(getAllDepartments());
   }, [dispatch]);
 
   useEffect(() => {
     let data = attendanceAll;
-
+    console.log("Attendance data:", data);
     // Tìm kiếm theo từ khóa
     if (searchRequest.keyword) {
-      data = data.filter((record: any) =>
-        record.employeeName
-          .toLowerCase()
-          .includes(searchRequest.keyword.toLowerCase())
+      data = data.filter(
+        (record: any) =>
+          record.employee.fullName
+            ?.toLowerCase()
+            .includes(searchRequest.keyword.toLowerCase()) ||
+          record.employee.code
+            ?.toLowerCase()
+            .includes(searchRequest.keyword.toLowerCase())
       );
     }
 
     // Lọc theo phòng ban
     if (searchRequest.department !== "ALL") {
+      console.log("Filtering by department:", searchRequest);
       data = data.filter(
-        (record: any) => record.department === searchRequest.department
+        (record: any) => record.employee.department?.id == searchRequest.department
       );
     }
 
@@ -111,6 +118,12 @@ export default function Attendance() {
     (searchRequest.page - 1) * searchRequest.size,
     searchRequest.page * searchRequest.size
   );
+
+  const handleDelete = (id: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa chấm công này?")) {
+      dispatch(deleteAttendance(id));
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -186,12 +199,11 @@ export default function Attendance() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Tất cả phòng ban</SelectItem>
-                    <SelectItem value="tech">Kỹ thuật</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="hr">Nhân sự</SelectItem>
-                    <SelectItem value="sales">Kinh doanh</SelectItem>
-                    <SelectItem value="finance">Tài chính</SelectItem>
-                    <SelectItem value="admin">Hành chính</SelectItem>
+                    {departmentAll.map((department: any) => (
+                      <SelectItem key={department.id} value={department.id}>
+                        {department.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <Select
@@ -233,7 +245,7 @@ export default function Attendance() {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar>
-                          <AvatarImage
+                            <AvatarImage
                               src={
                                 record?.employee?.avatar
                                   ? URL_IMAGE + record?.employee?.avatar
@@ -257,7 +269,9 @@ export default function Attendance() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{record?.employee?.department?.name}</TableCell>
+                      <TableCell>
+                        {record?.employee?.department?.name}
+                      </TableCell>
                       <TableCell>{record.date}</TableCell>
                       <TableCell>{record.checkIn}</TableCell>
                       <TableCell>{record.checkOut}</TableCell>
@@ -285,7 +299,11 @@ export default function Attendance() {
                             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                            <DropdownMenuItem>Xóa</DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(record.id)}
+                            >
+                              Xóa
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

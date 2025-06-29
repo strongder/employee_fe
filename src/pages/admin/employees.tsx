@@ -49,7 +49,11 @@ import { MoreHorizontal, Search } from "lucide-react";
 import { Pagination } from "@/components/pagination";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createEmployee, getAllEmployee } from "../../slice/employeeSlice.ts";
+import {
+  createEmployee,
+  deleteEmployee,
+  getAllEmployee,
+} from "../../slice/employeeSlice.ts";
 import { getAllDepartments } from "@/slice/departmentSlice.ts";
 import { getAllPositions } from "@/slice/positionSlice.ts";
 import { Link } from "react-router-dom";
@@ -108,7 +112,6 @@ export default function Employees() {
     return filteredEmployees.slice(start, start + searchRequest.size);
   }, [filteredEmployees, searchRequest]);
 
- 
   const [formData, setFormData] = useState({
     fullName: "",
     gender: "",
@@ -159,6 +162,14 @@ export default function Employees() {
       departmentId: 0,
       positionId: 0,
     });
+  };
+
+  const handleDelete: any = (id: number) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
+      return; // Nếu người dùng không xác nhận, không làm gì cả
+    }
+    dispatch(deleteEmployee(id));
+    alert("Xóa nhân viên thành công");
   };
 
   return (
@@ -581,15 +592,11 @@ export default function Employees() {
                                   Xem chi tiết
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="hover:bg-[#334155]">
-                                <Link
-                                  to={`/employees/${employee.id}`}
-                                  className="w-full"
-                                >
-                                  Chỉnh sửa
-                                </Link>
+                              <DropdownMenuItem>
+                                <div onClick={() => handleDelete(employee.id)}>
+                                  Xóa nhân viên
+                                </div>
                               </DropdownMenuItem>
-                              <DropdownMenuItem>Xóa nhân viên</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

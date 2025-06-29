@@ -66,7 +66,7 @@ export const getCurrentEmployee = createAsyncThunk(
 );
 
 // 5. Xóa employee
-export const deleteEmployee = createAsyncThunk(
+export const deleteEmployee:any = createAsyncThunk(
   "employee/delete",
   async (
     employeeId: number,
@@ -179,8 +179,9 @@ const employeeSlice = createSlice({
 
       // Xóa employee
       .addCase(deleteEmployee.fulfilled, (state, action: any) => {
+        console.log("Xóa thành công");
         state.loading = false;
-        state.employees = state.employees.filter(
+        state.employeeAll = state.employeeAll.filter(
           (emp) => emp.id !== action.payload
         );
       })

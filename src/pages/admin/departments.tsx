@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,12 @@ import {
 } from "@/components/ui/table";
 import { Pagination } from "@/components/pagination"; // Assuming you have a pagination component
 import { useDispatch, useSelector } from "react-redux";
-import { createDepartment, searchDepartments } from "@/slice/departmentSlice";
+import {
+  createDepartment,
+  deleteDepartment,
+  searchDepartments,
+  updateDepartment,
+} from "@/slice/departmentSlice";
 import { SearchRequest } from "@/util/searchRequest";
 
 interface Department {
@@ -52,8 +57,10 @@ interface Department {
 
 export default function DepartmentManagement() {
   const [open, setOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     description: "",
   });
@@ -61,13 +68,26 @@ export default function DepartmentManagement() {
   const { departments, pagination } = useSelector(
     (state: any) => state.department
   );
-  const [searchRequest, setSearchRequest] = useState<SearchRequest>({
-    keyword: "",
+  const [searchRequest, setSearchRequest] = useState<any>({
+    keyword: "name",
+    value: "",
     page: 1,
     size: 10,
     sortBy: "createdAt",
     sortDir: "desc",
   });
+  const filteredDepartment = useMemo(() => {
+    let data = departments || [];
+    if (searchRequest.value) {
+      data = data.filter((department: any) =>
+        department[searchRequest.keyword]
+          .toLowerCase()
+          .includes(searchRequest.value.toLowerCase())
+      );
+    }
+    return data;
+  }, [departments, searchRequest]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -77,18 +97,34 @@ export default function DepartmentManagement() {
   };
   useEffect(() => {
     dispatch(searchDepartments(searchRequest));
-  }, [searchRequest, dispatch]);
+  }, [dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const newDepartment: Department = {
-      name: formData.name,
-      description: formData.description,
-    };
-    dispatch(createDepartment(newDepartment));
-    setFormData({ name: "", description: "" });
+    if (editMode && formData.id) {
+      dispatch(updateDepartment({ id: formData.id, updatedData: formData }));
+      alert("Cập nhật phòng ban thành công");
+    } else {
+      dispatch(createDepartment({ name: formData.name, description: formData.description }));
+      alert("Thêm phòng ban thành công");
+    }
+    setFormData({ id: "", name: "", description: "" });
     setOpen(false);
+    setEditMode(false);
+  };
+  const handleEdit = (department: any) => {
+    setFormData({
+      id: department.id,
+      name: department.name,
+      description: department.description,
+    });
+    setEditMode(true);
+    setOpen(true);
+  };
+  const handleDelete = (id: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa phòng ban này?")) {
+      dispatch(deleteDepartment(id));
+    }
   };
 
   return (
@@ -101,11 +137,13 @@ export default function DepartmentManagement() {
               Thêm phòng ban
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>Thêm phòng ban mới</DialogTitle>
+              <DialogTitle>{editMode ? "Chỉnh sửa phòng ban" : "Thêm phòng ban mới"}</DialogTitle>
               <DialogDescription>
-                Điền thông tin để tạo phòng ban mới trong hệ thống.
+                {editMode
+                  ? "Chỉnh sửa lại thông tin phòng ban"
+                  : "Điền thông tin để tạo phòng ban mới trong hệ thống."}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
@@ -124,7 +162,6 @@ export default function DepartmentManagement() {
                     required
                   />
                 </div>
-
                 {/* Description */}
                 <div className="grid grid-cols-4 items-center gap-2">
                   <Label htmlFor="description" className="text-right">
@@ -140,7 +177,6 @@ export default function DepartmentManagement() {
                   />
                 </div>
               </div>
-
               <DialogFooter className="mt-4">
                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                   Lưu
@@ -168,6 +204,12 @@ export default function DepartmentManagement() {
                     type="search"
                     placeholder="Tìm kiếm phòng ban..."
                     className="pl-8 w-[250px]"
+                    onChange={(e) =>
+                      setSearchRequest((prev:any) => ({
+                        ...prev,
+                        value: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -183,36 +225,43 @@ export default function DepartmentManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {departments && departments.map((department:any) => (
-                    <TableRow key={department.id}>
-                      <TableCell className="font-medium">
-                        {department.name}
-                      </TableCell>
-                      <TableCell>
-                        <span className="truncate max-w-[200px] block">
-                          {department.description}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Mở menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Xóa phòng ban
+                  {filteredDepartment.map((department: any) => (
+                      <TableRow key={department.id}>
+                        <TableCell className="font-medium">
+                          {department.name}
+                        </TableCell>
+                        <TableCell>
+                          <span className="truncate max-w-[200px] block">
+                            {department.description}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Mở menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleEdit(department)}>
+                              Chỉnh sửa
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => {
+                                  handleDelete(department.id);
+                                }}
+                              >
+                                Xóa phòng ban
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </div>

@@ -49,9 +49,9 @@ import {
   searchSalary,
   createSalary,
   updateSalary,
-  deleteSalary,
   getAllSalary,
   calculateSalary,
+  deleteSalary,
 } from "@/slice/salarySlice";
 import { URL_IMAGE } from "../../../api";
 
@@ -248,6 +248,11 @@ export default function Salaries() {
         });
     }
   };
+  const handleDelete = (id: string) => {
+    dispatch(deleteSalary(id)).then(() => {
+      alert("Xóa thành công");
+    });
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -487,7 +492,7 @@ export default function Salaries() {
               name="bonusAmount"
               type="number"
               value={formData.bonusAmount}
-              onChange={handleChange}
+              // onChange={handleChange}
             />
             <Label>Khấu trừ</Label>
             <Input
@@ -565,7 +570,6 @@ export default function Salaries() {
               name="baseSalary"
               type="number"
               value={formData.baseSalary}
-              onChange={handleChange}
               required
             />
             <Label>Phụ cấp</Label>
@@ -580,7 +584,6 @@ export default function Salaries() {
               name="bonusAmount"
               type="number"
               value={formData.bonusAmount}
-              onChange={handleChange}
             />
             <Label>Khấu trừ</Label>
             <Input

@@ -51,7 +51,7 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Plus, Search } from "lucide-react";
 import { Pagination } from "@/components/pagination";
 import { useDispatch, useSelector } from "react-redux";
-import { createAccount, getAllAccounts, lockAccount, unlockAccount } from "../../slice/accountSlice";
+import { createAccount, deleteAccount, getAllAccounts, lockAccount, unlockAccount } from "../../slice/accountSlice";
 
 export default function Accounts() {
   const [open, setOpen] = useState(false);
@@ -140,8 +140,12 @@ export default function Accounts() {
 
   const handleUnlockAccount = (id: number) => {
     dispatch(unlockAccount(id));
+  };
 
- 
+  const handleDeleteAccount = (id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
+      dispatch(deleteAccount(id)); // Assuming lockAccount is used for deletion
+    }
   };
   return (
     <div className="flex flex-col gap-4">
@@ -403,7 +407,7 @@ export default function Accounts() {
                               </DropdownMenuItem>
                             )}
 
-                            <DropdownMenuItem>Xóa tài khoản</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteAccount(account.id)} >Xóa tài khoản</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

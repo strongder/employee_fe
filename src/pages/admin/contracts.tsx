@@ -23,7 +23,6 @@ import React from "react"
 import api from "../../../api";
 
 export default function Contracts() {
-  const [open, setOpen] = useState(false)
   const [searchRequest, setSearchRequest] = useState({
     keyword: "",
     page: 1,
@@ -81,22 +80,6 @@ export default function Contracts() {
     return `${dd}/${mm}/${yyyy}`;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Xử lý gửi dữ liệu hợp đồng và file lên server tại đây
-    setOpen(false)
-    setForm({
-      id: undefined,
-      contractCode: '',
-      employeeCode: '',
-      startDate: '',
-      endDate: '',
-      contractType: 'FULL_TIME',
-      contractStatus: 'ACTIVE',
-      contractFile: undefined,
-      monthlySalary: '',
-    })
-  }
 
   // Filter, search, paginate phía frontend
   const filteredContracts = React.useMemo(() => {
@@ -104,8 +87,8 @@ export default function Contracts() {
     if (searchRequest.keyword) {
       data = data.filter(
         (item: any) =>
-          item.employeeName?.toLowerCase().includes(searchRequest.keyword.toLowerCase()) ||
-          item.employeeCode?.toLowerCase().includes(searchRequest.keyword.toLowerCase())
+          item.employee?.fullName?.toLowerCase().includes(searchRequest.keyword.toLowerCase()) ||
+          item.employee?.code?.toLowerCase().includes(searchRequest.keyword.toLowerCase())
       );
     }
     if (searchRequest.contractType !== "ALL") {
@@ -191,7 +174,8 @@ export default function Contracts() {
 
   // Xóa hợp đồng
   const handleDeleteContract = (id: number) => {
-    // dispatch(deleteContract(id));
+    dispatch(deleteContract(id));
+    alert("Xóa hợp đồng thành công");
   };
   const handleDownload = async (contract: any) => {
     try {
@@ -286,7 +270,7 @@ export default function Contracts() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Mã hợp đồng</TableHead>
-                    <TableHead>Mã nhân viên</TableHead>
+                    <TableHead>Nhân viên</TableHead>
                     <TableHead>Loại hợp đồng</TableHead>
                     <TableHead>Ngày bắt đầu</TableHead>
                     <TableHead>Ngày kết thúc</TableHead>
@@ -299,7 +283,12 @@ export default function Contracts() {
                   {paginatedContracts && paginatedContracts.map((contract: any) => (
                     <TableRow key={contract.id}>
                       <TableCell>{contract.contractCode}</TableCell>
-                      <TableCell>{contract?.employee?.code}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium">{contract.employee?.fullName}</span>
+                          <span>{contract.employee?.code}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>{contract.contractType}</TableCell>
                       <TableCell>{contract.startDate}</TableCell>
                       <TableCell>{contract.endDate}</TableCell>
@@ -381,9 +370,9 @@ export default function Contracts() {
             <label className="font-medium">Ngày kết thúc</label>
             <Input type="date" name="endDate" value={form.endDate} onChange={handleChange} required />
             <label className="font-medium">Lương cơ bản (VND)</label>
-            <Input type="number" name="monthlySalary" value={form.monthlySalary} onChange={handleChange} required min={0} />
+            <Input type="number" name="monthlySalary" value={form.monthlySalary} onChange={handleChange} defaultValue={0} min={0} />
             <label className="font-medium">Tải file hợp đồng</label>
-            <Input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} required />
+            <Input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange}  />
             <DialogFooter>
               <Button type="submit">Lưu</Button>
               <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Hủy</Button>

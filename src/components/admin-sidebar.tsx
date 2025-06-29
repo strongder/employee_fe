@@ -49,7 +49,7 @@ const sidebarItems = [
     href: "/positions",
   },
   {
-    title: "Tài khoan",
+    title: "Tài khoản",
     icon: FileText,
     href: "/account",
   },

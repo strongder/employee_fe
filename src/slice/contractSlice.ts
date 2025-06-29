@@ -77,9 +77,9 @@ export const getContractById = createAsyncThunk(
 
 
 // 5. Xóa hợp đồng
-export const deleteContract = createAsyncThunk(
+export const deleteContract: any = createAsyncThunk(
   "contract/delete",
-  async (id, { rejectWithValue }) => {
+  async (id: any, { rejectWithValue }) => {
     try {
       await api.delete(`/contracts/delete/${id}`);
       return id;
@@ -159,7 +159,7 @@ const contractSlice = createSlice({
         state.contractAll = action.payload;
       })
       .addCase(deleteContract.fulfilled, (state, action) => {
-        state.contracts = state.contracts.filter(
+        state.contractAll = state.contractAll.filter(
           (ct: any) => ct.id !== action.payload
         );
       })

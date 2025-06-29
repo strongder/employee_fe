@@ -72,7 +72,7 @@ export const getByEmployee: any = createAsyncThunk(
 );
 
 // 5. Xóa thưởng
-export const deleteSalary = createAsyncThunk(
+export const deleteSalary: any = createAsyncThunk(
   "salary/delete",
   async (id, { rejectWithValue }) => {
     try {
@@ -167,7 +167,7 @@ const salarySlice = createSlice({
       // Xóa
       .addCase(deleteSalary.fulfilled, (state, action) => {
         state.loading = false;
-        state.salarys = state.salarys.filter(
+        state.salaryAll = state.salaryAll.filter(
           (item: any) => item.id !== action.payload
         );
       })

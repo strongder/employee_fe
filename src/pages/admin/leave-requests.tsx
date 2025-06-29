@@ -42,7 +42,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSelector, useDispatch } from "react-redux";
-import { changeStatus, getAllLeaveRequest } from "@/slice/leaveRequestSlice";
+import { changeStatus, deleteLeaveRequest, getAllLeaveRequest } from "@/slice/leaveRequestSlice";
 import { URL_IMAGE } from "../../../api";
 
 export default function LeaveRequests() {
@@ -96,6 +96,10 @@ export default function LeaveRequests() {
     setShowDetail(false);
   };
 
+  const handleDelete: any = (id: number) => {
+    dispatch(deleteLeaveRequest(id));
+    alert("Xóa thành công");
+  };
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -244,6 +248,13 @@ export default function LeaveRequests() {
                                 </DropdownMenuItem>
                               </>
                             )}
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => {
+                                handleDelete(request.id);
+                              }}>
+                              Xóa đơn
+                              </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

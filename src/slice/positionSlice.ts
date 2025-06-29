@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api";
 
 // 1. Tạo position
-export const createPosition:any = createAsyncThunk(
+export const createPosition: any = createAsyncThunk(
   "position/create",
   async (data, { rejectWithValue }) => {
     try {
@@ -15,7 +15,7 @@ export const createPosition:any = createAsyncThunk(
 );
 
 // 2. Tìm kiếm position
-export const searchPositions: any= createAsyncThunk(
+export const searchPositions: any = createAsyncThunk(
   "position/search",
   async (criteria, { rejectWithValue }) => {
     try {
@@ -41,7 +41,7 @@ export const getPositionById = createAsyncThunk(
 );
 
 // 4. Cập nhật position
-export const updatePosition = createAsyncThunk(
+export const updatePosition: any = createAsyncThunk(
   "position/update",
   async (
     { id, updatedData }: { id: any; updatedData: any },
@@ -49,7 +49,7 @@ export const updatePosition = createAsyncThunk(
   ) => {
     try {
       const res = await api.put(`/positions/update/${id}`, updatedData);
-      return res.data;
+      return res.data.result;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }
@@ -57,7 +57,7 @@ export const updatePosition = createAsyncThunk(
 );
 
 // 5. Xóa position
-export const deletePosition = createAsyncThunk(
+export const deletePosition: any = createAsyncThunk(
   "position/delete",
   async (id, { rejectWithValue }) => {
     try {
@@ -140,7 +140,7 @@ const positionSlice = createSlice({
       .addCase(getAllPositions.fulfilled, (state, action) => {
         state.loading = false;
         state.positionAll = action.payload || [];
-      })
+      });
   },
 });
 

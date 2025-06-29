@@ -72,10 +72,11 @@ export const changeAccountStatus = createAsyncThunk(
 );
 
 // 6. Xóa tài khoản
-export const deleteAccount = createAsyncThunk(
+export const deleteAccount: any = createAsyncThunk(
   "account/delete",
   async (id, { rejectWithValue }) => {
     try {
+      console.log("Deleting account with ID:", id);
       await api.delete(`/accounts/delete/${id}`);
       return id;
     } catch (err: any) {

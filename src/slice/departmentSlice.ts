@@ -41,7 +41,7 @@ export const getDepartmentById = createAsyncThunk(
 );
 
 // 4. Cập nhật phòng ban
-export const updateDepartment = createAsyncThunk(
+export const updateDepartment: any = createAsyncThunk(
   "department/update",
   async (
     { id, updatedData }: { id: any; updatedData: any },
@@ -57,7 +57,7 @@ export const updateDepartment = createAsyncThunk(
 );
 
 // 5. Xóa phòng ban
-export const deleteDepartment = createAsyncThunk(
+export const deleteDepartment: any = createAsyncThunk(
   "department/delete",
   async (id: any, { rejectWithValue }) => {
     try {
@@ -125,6 +125,7 @@ const departmentSlice = createSlice({
         );
       })
       .addCase(deleteDepartment.fulfilled, (state, action) => {
+        console.log("Xóa phòng ban thành công:", action.payload);
         state.departments = state.departments.filter(
           (dep: any) => dep.id !== action.payload
         );
